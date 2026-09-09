@@ -2,7 +2,7 @@
 NAME = codexion
 
 CC = cc
-CFLAGS = -Wall -Werror
+CFLAGS = 
 
 SRC = src/main.c src/init.c src/debug.c
 OBJ = $(SRC:.c=.o)
@@ -12,16 +12,16 @@ HEADERS = header/codexion.h
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
 %.o: %.c $(HEADERS)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ)
+	@rm -f $(OBJ)
 
 fclean: clean
-	rm -f $(NAME)
+	@rm -f $(NAME)
 
 re: fclean all
 
@@ -38,7 +38,7 @@ dongle_cooldown					= 100
 scheduler						= "fifo"
 
 run: $(NAME)
-	./$(NAME) $(number_of_coders) $(time_to_burnout) $(time_to_compile) $(time_to_debug) $(time_to_refactor) $(number_of_compiles_required) $(dongle_cooldown) $(scheduler)
+	@./$(NAME) $(number_of_coders) $(time_to_burnout) $(time_to_compile) $(time_to_debug) $(time_to_refactor) $(number_of_compiles_required) $(dongle_cooldown) $(scheduler)
 
 # run: $(NAME)
 # 	./$(NAME)\

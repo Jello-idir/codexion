@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/07/09 13:24:51 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/04 04:50:18 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CODEXION_H
 # define CODEXION_H
 
-#include "unistd.h"
-#include "stdio.h" // remove later
+#include "unistd.h" // not sure if used
+#include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
 
