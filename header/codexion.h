@@ -6,7 +6,7 @@
 /*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/04 04:50:18 by aixel            ###   ########.fr       */
+/*   Updated: 2026/09/10 17:38:15 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
+#include "pthread.h"
 
 // number_of_coders
 // time_to_burnout
@@ -40,6 +41,13 @@
 #define FIFO 1
 #define EDF 2
 // -----------------
+
+typedef struct s_coder_data {
+    unsigned int id;
+    char *name;
+    pthread_mutex_t *mutex;
+    pthread_cond_t *cond;
+} t_coder_data;
 
 
 // -- debug ----
