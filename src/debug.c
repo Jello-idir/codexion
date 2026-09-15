@@ -6,7 +6,7 @@
 /*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/09 13:24:02 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/04 05:03:14 by aixel            ###   ########.fr       */
+/*   Updated: 2026/09/11 10:04:30 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void display_simconf(int *simconf)
 		"scheduler",
 	};
 	printf("------------------------------\n");
+	printf("\033[2m");
 	for (int i = 0; i < 7; i++)
 		printf("- %-20s : %i\n", txt[i], simconf[i]);
 	char *type = "unknown";
@@ -33,5 +34,6 @@ void display_simconf(int *simconf)
 	else if (simconf[7] == EDF)
 		type = "edf";
 	printf("- %-20s : %s\n", txt[7], type);
+	printf("\033[0m");
 	printf("------------------------------\n");
 }
