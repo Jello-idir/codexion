@@ -2,7 +2,7 @@
 NAME = codexion
 
 CC = cc
-CFLAGS = 
+CFLAGS =
 
 SRC = src/main.c src/init.c src/debug.c
 OBJ = $(SRC:.c=.o)
@@ -28,7 +28,7 @@ re: fclean all
 
 .PHONY: all clean fclean re
 
-number_of_coders				= 7
+number_of_coders				= 3
 time_to_burnout					= 800
 time_to_compile					= 200
 time_to_debug					= 100

@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   debug.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/09 13:24:02 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/11 10:04:30 by aixel            ###   ########.fr       */
+/*   Updated: 2026/09/18 11:27:02 by aait-idi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/codexion.h"
+#include <stdio.h>
 
 void display_simconf(int *simconf)
 {

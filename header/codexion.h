@@ -6,13 +6,15 @@
 /*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/17 22:23:04 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/18 11:17:09 by aait-idi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CODEXION_H
 # define CODEXION_H
 
+#include <sys/_pthread/_pthread_mutex_t.h>
+#include <sys/_pthread/_pthread_t.h>
 #include <unistd.h> // not sure if used
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,11 +44,19 @@
 #define EDF 2
 // -----------------
 
-typedef struct s_coder_data {
-	unsigned int	id;
-	int				*simconf;
-}	t_coder;
 
+typedef struct s_dongle {
+	unsigned int	id;
+	pthread_mutex_t	*mutex;
+}	t_dongle;
+
+typedef struct s_coder {
+	unsigned int	id;
+	pthread_t		thread;
+	int				*simconf;
+	t_dongle		*rdongle;
+	t_dongle		*ldongle;
+}	t_coder;
 
 // -- debug --
 void display_simconf(int *simconf);
