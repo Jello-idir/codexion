@@ -6,7 +6,7 @@
 /*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/18 11:17:09 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/19 10:33:54 by aait-idi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,15 @@ typedef struct s_coder {
 	int				*simconf;
 	t_dongle		*rdongle;
 	t_dongle		*ldongle;
+	pthread_mutex_t	*talking_pillow;
 }	t_coder;
 
+// init
+int		init_simconf(int arg_cnt, char **args, int *simconf);
+t_coder	**init_coders(int *simconf);
+t_dongle	**init_dongles(int *simconf);
+
 // -- debug --
-void display_simconf(int *simconf);
+void	display_simconf(int *simconf);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:51:29 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/18 11:55:59 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/19 13:18:05 by aait-idi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,109 +18,54 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-int init_simconf(int arg_cnt, char **args, int *simconf)
-{
-	int i;
+#define DELAY 10000
 
-	if (arg_cnt != 8)
-		return 1;
-	i = 0;
-	while (i < 7)
-	{
-		simconf[i] = atoi(args[i]);
-		if (simconf[i] <= 0)
-			return 1;
-		i++;
+void ssay(char *s) {
+	for (int i = 0; i < (int)strlen(s); i++) {
+		write(1, s + i, 1); usleep(DELAY);
 	}
-	if (strcmp(args[7], "fifo") == 0)
-		simconf[SCHEDULER] = FIFO;
-	else if (strcmp(args[7], "edf") == 0)
-		simconf[SCHEDULER] = EDF;
-	else
-		return 1;
-	return 0;
 }
 
-t_coder	**init_coders(int *simconf)
-{
-	int		i;
-	t_coder	**coders;
-
-	coders = malloc(sizeof(t_coder *) * simconf[N_CODERS]);
-	if (!coders)
-		return NULL;
-	i = 0;
-	while (i < simconf[N_CODERS])
-	{
-		coders[i] = malloc(sizeof(t_coder));
-		if (!coders[i])
-			return NULL;
-		coders[i]->id = i + 1;
-		coders[i]->simconf = simconf;
-		i++;
-	}
-	return coders;
-}
-
-t_dongle	**init_dongles(int *simconf)
-{
-	int	i;
-	t_dongle **dongles;
-
-	dongles = malloc(sizeof(t_dongle *) * simconf[N_CODERS]);
-	if (!dongles)
-		return NULL;
-	i = 0;
-	while (i < simconf[N_CODERS])
-	{
-		dongles[i] = malloc(sizeof(t_dongle));
-		if (!dongles[i])
-			return NULL;
-		dongles[i]->id = i +1;
-		dongles[i]->mutex = malloc(sizeof(pthread_mutex_t));
-		if (!dongles[i]->mutex)
-			return NULL;
-		if (pthread_mutex_init(dongles[i]->mutex, NULL))
-			return NULL;
-		i++;
-	}
-	return dongles;
-}
-
-void say(char who, char *s)
-{
-	int	i;
-	int	len;
-
-
-	write(1, &who, 1);
-	usleep(100000);
-	write(1, ": ", 2);
-	usleep(100000);
-
-	len = strlen(s);
-	i = 0;
-	while (i < len)
-	{
-		write(1, s + i, 1);
-		usleep(100000);
-		i++;
-	}
+void nsay(int n) {
+	char c = n + '0'; write(1, &c, 1); usleep(DELAY);
 }
 
 void	*coder_job(void	*arg)
 {
 	t_coder *coder;
+	int		color;
+	char	name[2];
 
 	coder = (t_coder *)arg;
+	color = coder->id + 30;
+	name[0] = coder->id + '@';
+	name[1] = 0;
 	while (1)
 	{
 		pthread_mutex_lock(coder->rdongle->mutex);
 		pthread_mutex_lock(coder->ldongle->mutex);
-		say(coder->id + '@', "is starting ... ");
-		usleep(500000);
-		say(coder->id + '@', "is DONE\n");
-		fflush(stdout);
+
+		pthread_mutex_lock(coder->talking_pillow);
+		printf("\033[%im", color);
+		ssay(name);
+		ssay(" is working with: ");
+		nsay(coder->ldongle->id);
+		ssay(" - ");
+		nsay(coder->rdongle->id);
+		printf("\033[0m\n");
+		pthread_mutex_unlock(coder->talking_pillow);
+
+		sleep(5);
+
+
+		pthread_mutex_lock(coder->talking_pillow);
+		ssay("    ");
+		printf("\033[%im", color);
+		ssay(name);
+		ssay(" is done\n");
+		printf("\033[0m");
+		pthread_mutex_unlock(coder->talking_pillow);
+
 		pthread_mutex_unlock(coder->rdongle->mutex);
 		pthread_mutex_unlock(coder->ldongle->mutex);
 		sleep(1);
@@ -151,44 +96,52 @@ void	add_dongles_to_coders(t_coder **coders, t_dongle **dongles, int *simconf)
 	i = 0;
 	while (i < simconf[N_CODERS])
 	{
-		printf("adding dongles to %i\n", coders[i]->id);
 		coders[i]->ldongle = dongles[i];
 		coders[i]->rdongle = dongles[(i + 1) % (simconf[N_CODERS])];
 		i++;
 	}
 }
 
+void	add_talking_pillow_to_coders(t_coder **coders, pthread_mutex_t *talking_pillow, int *simconf)
+{
+	int	i;
+
+	i = 0;
+	pthread_mutex_init(talking_pillow, NULL);
+	while (i < simconf[N_CODERS])
+		coders[i++]->talking_pillow = talking_pillow;
+}
+
 int main(int ac, char *av[])
 {
 	int	simconf[8];
-	t_coder		**coders;
-	t_dongle	**dongles;
-	pthread_t *coders_thread_ids;
+	t_coder				**coders;
+	t_dongle			**dongles;
+	pthread_t			*coders_thread_ids;
+	pthread_mutex_t		talking_pillow;
+
+	setbuf(stdout, NULL);
 
 	if (init_simconf(ac - 1, av + 1, simconf))
 		fprintf(stderr, "Error\n");
 
-	fflush(stdout);
 	display_simconf(simconf);
 
-	fflush(stdout);
 	coders = init_coders(simconf);
 	if (!coders)
 		fprintf(stderr, "Error\n");
 
-	fflush(stdout);
 	dongles = init_dongles(simconf);
 	if (!dongles)
 		fprintf(stderr, "Error\n");
 
 	add_dongles_to_coders(coders, dongles, simconf);
 
-	fflush(stdout);
+	add_talking_pillow_to_coders(coders, &talking_pillow, simconf);
+
 	coders_thread_ids = start_coders(coders, simconf);
 	if (!coders_thread_ids)
 		fprintf(stderr, "Error\n");
-
-	fflush(stdout);
 
 	pthread_join(coders_thread_ids[0], NULL);
 	return 0;
