@@ -6,7 +6,7 @@
 /*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:51:29 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/19 13:18:05 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/20 10:15:56 by aait-idi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,27 +27,29 @@ void ssay(char *s) {
 }
 
 void nsay(int n) {
-	char c = n + '0'; write(1, &c, 1); usleep(DELAY);
+	char	c = n % 10 + '0';
+	if (n > 9)
+		nsay(n / 10);
+	write(1, &c, 1);
+	usleep(DELAY);
 }
 
 void	*coder_job(void	*arg)
 {
 	t_coder *coder;
 	int		color;
-	char	name[2];
 
 	coder = (t_coder *)arg;
-	color = coder->id + 30;
-	name[0] = coder->id + '@';
-	name[1] = 0;
+	color = coder->id;
 	while (1)
 	{
 		pthread_mutex_lock(coder->rdongle->mutex);
+		usleep(100);
 		pthread_mutex_lock(coder->ldongle->mutex);
 
 		pthread_mutex_lock(coder->talking_pillow);
-		printf("\033[%im", color);
-		ssay(name);
+		printf("\033[38;5;%im", color);
+		nsay(coder->id);
 		ssay(" is working with: ");
 		nsay(coder->ldongle->id);
 		ssay(" - ");
@@ -55,20 +57,20 @@ void	*coder_job(void	*arg)
 		printf("\033[0m\n");
 		pthread_mutex_unlock(coder->talking_pillow);
 
-		sleep(5);
-
+		usleep(coder->simconf[COMPILE_T]);
 
 		pthread_mutex_lock(coder->talking_pillow);
 		ssay("    ");
-		printf("\033[%im", color);
-		ssay(name);
+		printf("\033[38;5;%im", color);
+		nsay(coder->id);
 		ssay(" is done\n");
 		printf("\033[0m");
 		pthread_mutex_unlock(coder->talking_pillow);
 
 		pthread_mutex_unlock(coder->rdongle->mutex);
 		pthread_mutex_unlock(coder->ldongle->mutex);
-		sleep(1);
+		usleep(coder->simconf[DEBUG_T]);
+		usleep(coder->simconf[REFACTOR_T]);
 	}
 	return NULL;
 }
