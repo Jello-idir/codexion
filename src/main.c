@@ -3,21 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:51:29 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/20 10:15:56 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/22 17:57:53 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/codexion.h"
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/_pthread/_pthread_mutex_t.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
 #define DELAY 10000
 
 void ssay(char *s) {
@@ -41,10 +34,8 @@ void	*coder_job(void	*arg)
 
 	coder = (t_coder *)arg;
 	color = coder->id;
-	while (1)
-	{
+	while (1) {
 		pthread_mutex_lock(coder->rdongle->mutex);
-		usleep(100);
 		pthread_mutex_lock(coder->ldongle->mutex);
 
 		pthread_mutex_lock(coder->talking_pillow);
@@ -57,8 +48,6 @@ void	*coder_job(void	*arg)
 		printf("\033[0m\n");
 		pthread_mutex_unlock(coder->talking_pillow);
 
-		usleep(coder->simconf[COMPILE_T]);
-
 		pthread_mutex_lock(coder->talking_pillow);
 		ssay("    ");
 		printf("\033[38;5;%im", color);
@@ -69,6 +58,7 @@ void	*coder_job(void	*arg)
 
 		pthread_mutex_unlock(coder->rdongle->mutex);
 		pthread_mutex_unlock(coder->ldongle->mutex);
+
 		usleep(coder->simconf[DEBUG_T]);
 		usleep(coder->simconf[REFACTOR_T]);
 	}

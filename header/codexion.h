@@ -3,18 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/19 10:33:54 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/22 21:52:22 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CODEXION_H
 # define CODEXION_H
 
-#include <sys/_pthread/_pthread_mutex_t.h>
-#include <sys/_pthread/_pthread_t.h>
 #include <unistd.h> // not sure if used
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,7 +55,15 @@ typedef struct s_coder {
 	t_dongle		*rdongle;
 	t_dongle		*ldongle;
 	pthread_mutex_t	*talking_pillow;
+	int				death_time;
 }	t_coder;
+
+
+typedef struct s_heap {
+    int		size;
+    int		capacity;
+    t_coder	**coders;
+} t_heap;
 
 // init
 int		init_simconf(int arg_cnt, char **args, int *simconf);
@@ -66,5 +72,12 @@ t_dongle	**init_dongles(int *simconf);
 
 // -- debug --
 void	display_simconf(int *simconf);
+void	heap_print(t_heap *heap);
+
+// heap api
+
+t_heap	*heap_init(int capacity);
+t_coder *heappop(t_heap *heap);
+void    heappush(t_heap *heap, t_coder *newcoder);
 
 #endif

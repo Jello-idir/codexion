@@ -4,7 +4,7 @@ NAME = codexion
 CC = cc
 CFLAGS =
 
-SRC = src/main.c src/init.c src/debug.c
+SRC = src/main.c src/init.c src/debug.c src/heap.c
 OBJ = $(SRC:.c=.o)
 HEADERS = header/codexion.h
 # ----------------------
