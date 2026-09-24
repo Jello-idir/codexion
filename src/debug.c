@@ -6,13 +6,13 @@
 /*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/09 13:24:02 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/22 21:44:04 by aixel            ###   ########.fr       */
+/*   Updated: 2026/09/23 15:52:21 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/codexion.h"
 
-void display_simconf(int *simconf)
+void display_conf(int *simconf)
 {
 	char *txt[] = {
 		"number_of_coders",

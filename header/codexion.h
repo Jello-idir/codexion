@@ -6,7 +6,7 @@
 /*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/22 21:52:22 by aixel            ###   ########.fr       */
+/*   Updated: 2026/09/23 15:49:33 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ typedef struct s_dongle {
 typedef struct s_coder {
 	unsigned int	id;
 	pthread_t		thread;
-	int				*simconf;
+	int				*conf;
 	t_dongle		*rdongle;
 	t_dongle		*ldongle;
 	pthread_mutex_t	*talking_pillow;
@@ -66,12 +66,12 @@ typedef struct s_heap {
 } t_heap;
 
 // init
-int		init_simconf(int arg_cnt, char **args, int *simconf);
-t_coder	**init_coders(int *simconf);
-t_dongle	**init_dongles(int *simconf);
+int		init_conf(int arg_cnt, char **args, int *simconf);
+t_coder	**init_coders(int *conf);
+t_dongle	**init_dongles(int *conf);
 
 // -- debug --
-void	display_simconf(int *simconf);
+void	display_conf(int *simconf);
 void	heap_print(t_heap *heap);
 
 // heap api

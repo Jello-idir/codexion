@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:51:26 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/18 12:43:48 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/23 15:51:41 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/codexion.h"
 
-int init_simconf(int arg_cnt, char **args, int *simconf)
+int init_conf(int arg_cnt, char **args, int *conf)
 {
 	int i;
 
@@ -21,51 +21,51 @@ int init_simconf(int arg_cnt, char **args, int *simconf)
 	i = 0;
 	while (i < 7)
 	{
-		simconf[i] = atoi(args[i]);
-		if (simconf[i] <= 0)
+		conf[i] = atoi(args[i]);
+		if (conf[i] <= 0)
 			return 1;
 		i++;
 	}
 	if (strcmp(args[7], "fifo") == 0)
-		simconf[SCHEDULER] = FIFO;
+		conf[SCHEDULER] = FIFO;
 	else if (strcmp(args[7], "edf") == 0)
-		simconf[SCHEDULER] = EDF;
+		conf[SCHEDULER] = EDF;
 	else
 		return 1;
 	return 0;
 }
 
-t_coder	**init_coders(int *simconf)
+t_coder	**init_coders(int *conf)
 {
 	int		i;
 	t_coder	**coders;
 
-	coders = malloc(sizeof(t_coder *) * simconf[N_CODERS]);
+	coders = malloc(sizeof(t_coder *) * conf[N_CODERS]);
 	if (!coders)
 		return NULL;
 	i = 0;
-	while (i < simconf[N_CODERS])
+	while (i < conf[N_CODERS])
 	{
 		coders[i] = malloc(sizeof(t_coder));
 		if (!coders[i])
 			return NULL;
 		coders[i]->id = i + 1;
-		coders[i]->simconf = simconf;
+		coders[i]->conf = conf;
 		i++;
 	}
 	return coders;
 }
 
-t_dongle	**init_dongles(int *simconf)
+t_dongle	**init_dongles(int *conf)
 {
 	int	i;
 	t_dongle **dongles;
 
-	dongles = malloc(sizeof(t_dongle *) * simconf[N_CODERS]);
+	dongles = malloc(sizeof(t_dongle *) * conf[N_CODERS]);
 	if (!dongles)
 		return NULL;
 	i = 0;
-	while (i < simconf[N_CODERS])
+	while (i < conf[N_CODERS])
 	{
 		dongles[i] = malloc(sizeof(t_dongle));
 		if (!dongles[i])
