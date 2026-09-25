@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/23 15:49:33 by aixel            ###   ########.fr       */
+/*   Updated: 2026/09/26 00:41:34 by aait-idi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <time.h>
+
 
 // number_of_coders
 // time_to_burnout
@@ -41,16 +43,28 @@
 #define FIFO 1
 #define EDF 2
 // -----------------
+#define ALCERR 1
+#define CNDERR 2
+#define MTXERR 3
+// -----------------
+#define FIRST 0
+#define SECOND 1
 
-
-typedef struct s_dongle {
-	unsigned int	id;
-	pthread_mutex_t	*mutex;
+typedef struct s_dongle
+{
+	int				id;
+	int				in_use;
+	struct timespec	released_at;
+	pthread_mutex_t	mutex;
+	pthread_cond_t	ready;
 }	t_dongle;
+
 
 typedef struct s_coder {
 	unsigned int	id;
 	pthread_t		thread;
+	pthread_cond_t	perm;
+	pthread_mutex_t	mutex;
 	int				*conf;
 	t_dongle		*rdongle;
 	t_dongle		*ldongle;

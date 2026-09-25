@@ -28,9 +28,9 @@ re: fclean all
 
 .PHONY: all clean fclean re
 
-number_of_coders				= 2
+number_of_coders				= 4
 time_to_burnout					= 800
-time_to_compile					= 120000
+time_to_compile					= 1200
 time_to_debug					= 100
 time_to_refactor				= 300
 number_of_compiles_required 	= 20
