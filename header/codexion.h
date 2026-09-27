@@ -6,13 +6,14 @@
 /*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/26 00:41:34 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/26 20:49:57 by aait-idi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CODEXION_H
 # define CODEXION_H
 
+#include "../../../jello/lib/mytools.h"
 #include <unistd.h> // not sure if used
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +38,7 @@
 #define DEBUG_T 3
 #define REFACTOR_T 4
 #define N_COMPILES 5
-#define D_COODLDOWN 6
+#define D_COOLDOWN 6
 #define SCHEDULER 7
 // -----------------
 #define FIFO 1
@@ -50,10 +51,11 @@
 #define FIRST 0
 #define SECOND 1
 
+
 typedef struct s_dongle
 {
 	int				id;
-	int				in_use;
+	int				available;
 	struct timespec	released_at;
 	pthread_mutex_t	mutex;
 	pthread_cond_t	ready;
@@ -65,10 +67,11 @@ typedef struct s_coder {
 	pthread_t		thread;
 	pthread_cond_t	perm;
 	pthread_mutex_t	mutex;
-	int				*conf;
+	int				*simconf;
+	struct timespec	*start_time;
 	t_dongle		*rdongle;
 	t_dongle		*ldongle;
-	pthread_mutex_t	*talking_pillow;
+	pthread_mutex_t	*radio;
 	int				death_time;
 }	t_coder;
 
@@ -79,14 +82,32 @@ typedef struct s_heap {
     t_coder	**coders;
 } t_heap;
 
+
+typedef struct	s_conf
+{
+	int				*simconf;
+	struct timespec	*start_time;
+	t_coder			**coders;
+	t_dongle		**dongles;
+	pthread_t		*thread_ids;
+	pthread_mutex_t	radio;
+	t_heap			heap;
+}					t_conf;
+
+void print_timestamp(struct timespec *start_time);
+
 // init
-int		init_conf(int arg_cnt, char **args, int *simconf);
-t_coder	**init_coders(int *conf);
-t_dongle	**init_dongles(int *conf);
+int		init_conf(int arg_cnt, char **args, t_conf *conf);
+t_coder	**init_coders(t_conf *conf);
+t_dongle	**init_dongles(t_conf *conf);
 
 // -- debug --
 void	display_conf(int *simconf);
 void	heap_print(t_heap *heap);
+void	ssay(char *s);
+void	nsay(int n);
+void	anounce_coder_is_working(t_coder *coder);
+void	anounce_coder_is_done(t_coder *coder);
 
 // heap api
 
