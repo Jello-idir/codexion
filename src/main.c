@@ -6,7 +6,7 @@
 /*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:51:29 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/26 21:00:30 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/28 00:52:10 by aait-idi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	dongle_cooldown(t_dongle *dongle)
 	struct timespec now;
 
 	pthread_mutex_lock(&dongle->mutex);
+	usleep(5000000);
 	dongle->available = 1;
 	pthread_cond_signal(&dongle->ready);
 	pthread_mutex_unlock(&dongle->mutex);
@@ -37,17 +38,14 @@ void	get_dongle(t_dongle *dongle)
 
 void	release_dongle(t_dongle *dongle)
 {
-	pthread_mutex_lock(&dongle->mutex);
-	dongle->available = 1;
-	pthread_cond_signal(&dongle->ready);
-	pthread_mutex_unlock(&dongle->mutex);
+	dongle_cooldown(dongle);
 }
 
 void	radio_message(t_coder *coder, char *what)
 {
 	pthread_mutex_lock(coder->radio);
 	print_timestamp(coder->start_time);
-	printf("\033[38;5;%dm", coder->id);
+	printf("\033[1;3;38;5;%dm", coder->id % 7 + 1);
 	printf(" %d %s\n", coder->id, what);
 	printf("\033[0m");
 	pthread_mutex_unlock(coder->radio);
@@ -60,7 +58,7 @@ void	get_dongles(t_coder *coder)
 	dongle[FIRST] = coder->ldongle;
 	dongle[SECOND] = coder->rdongle;
 
-	if (coder->ldongle->id > coder->rdongle->id)
+	if (coder->rdongle->id % 2)
 	{
 		dongle[FIRST] = coder->rdongle;
 		dongle[SECOND] = coder->ldongle;
@@ -80,17 +78,20 @@ void	release_dongles(t_coder *coder)
 void	compile(t_coder *coder)
 {
 	get_dongles(coder);
+	radio_message(coder, "is compiling");
 	usleep(coder->simconf[COMPILE_T] * 1000);
 	release_dongles(coder);
 }
 
 void debug(t_coder *coder)
 {
+	radio_message(coder, "is debugging");
 	usleep(coder->simconf[DEBUG_T]);
 }
 
 void refactor(t_coder *coder)
 {
+	radio_message(coder, "is refactoring");
 	usleep(coder->simconf[REFACTOR_T]);
 }
 

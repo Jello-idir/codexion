@@ -6,29 +6,12 @@
 /*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/09 13:24:02 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/26 20:59:37 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/28 00:02:58 by aait-idi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/codexion.h"
 #include <time.h>
-#define DELAY 10000
-#define MAXCOLOR 15
-
-// void ssay(char *s)
-// {
-// 	for (int i = 0; i < (int)strlen(s); i++) {
-// 		write(1, s + i, 1); usleep(DELAY);
-// 	}
-// }
-
-// void nsay(int n) {
-// 	char	c = n % 10 + '0';
-// 	if (n > 9)
-// 		nsay(n / 10);
-// 	write(1, &c, 1);
-// 	usleep(DELAY);
-// }
 
 unsigned long    ts_to_ms(struct timespec *ts)
 {
@@ -45,36 +28,6 @@ void print_timestamp(struct timespec *start_time)
     printf("%05lu", ts_to_ms(&now) - ts_to_ms(start_time));
 }
 
-void	anounce_coder_is_working(t_coder *coder)
-{
-    int color = coder->id % MAXCOLOR + 1;
-	// locking pillow
-	pthread_mutex_lock(coder->radio);
-
-    print_timestamp(coder->start_time);
-	printf("\033[38;5;%im", color);
-    printf("coder%d", coder->id);
-	printf("\033[0m");
-    printf(" using %d - %d\n", coder->ldongle->id, coder->rdongle->id);
-
-	//unlocking pillow
-	pthread_mutex_unlock(coder->radio);
-
-}
-
-void	anounce_coder_is_done(t_coder *coder)
-{
-    int color = coder->id % MAXCOLOR + 1;
-	// locking pillow
-	pthread_mutex_lock(coder->radio);
-
-    print_timestamp(coder->start_time);
-	printf("\033[38;5;%im", color);
-	printf(" *coder%d\033[0m is done\n", coder->id);
-
-	// unlocking pillow
-	pthread_mutex_unlock(coder->radio);
-}
 void display_conf(int *simconf)
 {
 	char *txt[] = {
@@ -120,7 +73,6 @@ int count_levels_in_tree(int size) {
     return cnt;
 }
 
-
 int power(int a, int p)
 {
     int result = 1;
@@ -132,6 +84,7 @@ int power(int a, int p)
     }
     return result;
 }
+
 void heap_print(t_heap *heap) {
     int curr_level = 0;
     int max_level = count_levels_in_tree(heap->size);
@@ -143,8 +96,7 @@ void heap_print(t_heap *heap) {
 
     nodes_in_level = power(2, curr_level);
     printf("------------------------------------\n");
-    for (int i = 0; i < heap->size; i++)
-    {
+    for (int i = 0; i < heap->size; i++) {
         space = base >> curr_level;
         if (first) {
             first = 0;

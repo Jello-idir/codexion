@@ -27,13 +27,13 @@ re: fclean all
 
 .PHONY: all clean fclean re
 
-number_of_coders				= 1000
+number_of_coders				= 2
 time_to_burnout					= 800
-time_to_compile					= 200
+time_to_compile					= 2000
 time_to_debug					= 100
 time_to_refactor				= 300
 number_of_compiles_required 	= 20
-dongle_cooldown					= 100
+dongle_cooldown					= 10000
 scheduler						= "fifo"
 
 run: $(NAME)

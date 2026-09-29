@@ -6,7 +6,7 @@
 /*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/26 20:49:57 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/28 00:04:30 by aait-idi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,10 +104,6 @@ t_dongle	**init_dongles(t_conf *conf);
 // -- debug --
 void	display_conf(int *simconf);
 void	heap_print(t_heap *heap);
-void	ssay(char *s);
-void	nsay(int n);
-void	anounce_coder_is_working(t_coder *coder);
-void	anounce_coder_is_done(t_coder *coder);
 
 // heap api
 
