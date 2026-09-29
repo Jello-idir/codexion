@@ -3,26 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:51:29 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/28 00:52:10 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/29 23:31:53 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/codexion.h"
-#include <pthread.h>
-#include <stdio.h>
-#include <sys/_pthread/_pthread_mutex_t.h>
-#include <time.h>
-#include <unistd.h>
+
+unsigned long long	ts_to_ms(struct timespec *ts)
+{
+    return (ts->tv_sec * 1000 + ts->tv_nsec / 1000000);
+}
+
+unsigned long long get_simulation_time(struct timespec *start_time)
+{
+	struct timespec now;
+	now.tv_nsec = 0;
+	now.tv_sec = 0;
+
+	clock_gettime(CLOCK_MONOTONIC, &now);
+	return (ts_to_ms(&now) - ts_to_ms(start_time));
+}
 
 void	dongle_cooldown(t_dongle *dongle)
 {
 	struct timespec now;
 
 	pthread_mutex_lock(&dongle->mutex);
-	usleep(5000000);
+	usleep(500);
 	dongle->available = 1;
 	pthread_cond_signal(&dongle->ready);
 	pthread_mutex_unlock(&dongle->mutex);
@@ -41,14 +51,18 @@ void	release_dongle(t_dongle *dongle)
 	dongle_cooldown(dongle);
 }
 
-void	radio_message(t_coder *coder, char *what)
+unsigned long long	radio_message(t_coder *coder, char *what)
 {
+	unsigned long long now;
+
 	pthread_mutex_lock(coder->radio);
-	print_timestamp(coder->start_time);
-	printf("\033[1;3;38;5;%dm", coder->id % 7 + 1);
+	now = get_simulation_time(coder->start_time);
+	printf("%05llu", now);
+	printf("\033[38;5;%dm", coder->id % 7 + 1);
 	printf(" %d %s\n", coder->id, what);
 	printf("\033[0m");
 	pthread_mutex_unlock(coder->radio);
+	return (now);
 }
 
 void	get_dongles(t_coder *coder)
@@ -77,8 +91,11 @@ void	release_dongles(t_coder *coder)
 
 void	compile(t_coder *coder)
 {
+	unsigned long long compile_start;
+
 	get_dongles(coder);
-	radio_message(coder, "is compiling");
+	compile_start = radio_message(coder, "is compiling");
+	coder->death_time = compile_start + coder->simconf[BURNOUT_T];
 	usleep(coder->simconf[COMPILE_T] * 1000);
 	release_dongles(coder);
 }
@@ -86,13 +103,13 @@ void	compile(t_coder *coder)
 void debug(t_coder *coder)
 {
 	radio_message(coder, "is debugging");
-	usleep(coder->simconf[DEBUG_T]);
+	usleep(coder->simconf[DEBUG_T] * 1000);
 }
 
 void refactor(t_coder *coder)
 {
 	radio_message(coder, "is refactoring");
-	usleep(coder->simconf[REFACTOR_T]);
+	usleep(coder->simconf[REFACTOR_T] * 1000);
 }
 
 void	*coder_job(void	*arg)
@@ -109,43 +126,42 @@ void	*coder_job(void	*arg)
 	return NULL;
 }
 
-pthread_t	*start_coders(t_conf conf)
+pthread_t	*start_coders(t_conf *conf)
 {
 	int	i;
 	pthread_t	*coders_thread;
 
-	coders_thread = malloc(sizeof(pthread_t) * conf.simconf[N_CODERS]);
+	coders_thread = malloc(sizeof(pthread_t) * conf->simconf[N_CODERS]);
 	i = 0;
-	while (i < conf.simconf[N_CODERS])
+	while (i < conf->simconf[N_CODERS])
 	{
-		if (pthread_create((pthread_t *)coders_thread + i, NULL, coder_job, conf.coders[i]))
+		if (pthread_create((pthread_t *)coders_thread + i, NULL, coder_job, conf->coders[i]))
 			return NULL;
 		i++;
 	}
 	return coders_thread;
 }
 
-void	add_dongles_to_coders(t_conf conf)
+void	add_dongles_to_coders(t_conf *conf)
 {
 	int	i;
 
 	i = 0;
-	while (i < conf.simconf[N_CODERS])
+	while (i < conf->simconf[N_CODERS])
 	{
-		conf.coders[i]->ldongle = conf.dongles[i];
-		conf.coders[i]->rdongle = conf.dongles[(i + 1) % (conf.simconf[N_CODERS])];
+		conf->coders[i]->ldongle = conf->dongles[i];
+		conf->coders[i]->rdongle = conf->dongles[(i + 1) % (conf->simconf[N_CODERS])];
 		i++;
 	}
 }
 
-void	add_talking_pillow_to_coders(t_conf conf)
+void	add_talking_pillow_to_coders(t_conf *conf)
 {
 	int	i;
 
 	i = 0;
-	pthread_mutex_init(&conf.radio, NULL);
-	while (i < conf.simconf[N_CODERS])
-		conf.coders[i++]->radio = &conf.radio;
+	while (i < conf->simconf[N_CODERS])
+		conf->coders[i++]->radio = &conf->radio;
 }
 
 int main(int ac, char *av[])
@@ -166,10 +182,10 @@ int main(int ac, char *av[])
 	if (!conf.dongles)
 		fprintf(stderr, "Error\n");
 
-	add_dongles_to_coders(conf);
-	add_talking_pillow_to_coders(conf);
+	add_dongles_to_coders(&conf);
+	add_talking_pillow_to_coders(&conf);
 
-	conf.thread_ids = start_coders(conf);
+	conf.thread_ids = start_coders(&conf);
 	if (!conf.thread_ids)
 		fprintf(stderr, "Error\n");
 

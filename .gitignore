@@ -1,0 +1,5 @@
+# main executable
+codexion
+
+# object files
+*.o

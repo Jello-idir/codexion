@@ -3,33 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/28 00:04:30 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/29 23:20:01 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CODEXION_H
 # define CODEXION_H
 
-#include "../../../jello/lib/mytools.h"
 #include <unistd.h> // not sure if used
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
 #include <time.h>
-
-
-// number_of_coders
-// time_to_burnout
-// time_to_compile
-// time_to_debug
-// time_to_refactor
-// number_of_compiles_required
-// dongle_cooldown
-// scheduler
 
 // -----------------
 #define N_CODERS 0

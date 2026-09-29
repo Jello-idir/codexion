@@ -3,7 +3,7 @@ NAME = codexion
 CC = cc
 CFLAGS = -pthread
 
-SRC = src/main.c src/init.c src/debug.c src/heap.c ../../jello/lib/mytools.c
+SRC = src/main.c src/init.c src/heap.c
 OBJ = $(SRC:.c=.o)
 HEADERS = header/codexion.h
 # ----------------------
@@ -27,13 +27,13 @@ re: fclean all
 
 .PHONY: all clean fclean re
 
-number_of_coders				= 2
+number_of_coders				= 24
 time_to_burnout					= 800
-time_to_compile					= 2000
+time_to_compile					= 200
 time_to_debug					= 100
 time_to_refactor				= 300
 number_of_compiles_required 	= 20
-dongle_cooldown					= 10000
+dongle_cooldown					= 100
 scheduler						= "fifo"
 
 run: $(NAME)
