@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heap.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aait-idi <aait-idi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/20 18:03:06 by aixel             #+#    #+#             */
-/*   Updated: 2026/09/24 12:32:23 by aait-idi         ###   ########.fr       */
+/*   Updated: 2026/09/30 21:08:17 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ static void    heappify(t_heap *heap, int index)
     small = index;
     left = small * 2 + 1;
     right = small * 2 + 2;
+
     if (heap->size > left && heap->coders[left]->death_time < heap->coders[small]->death_time)
         small = left;
     if (heap->size > right && heap->coders[right]->death_time < heap->coders[small]->death_time)
@@ -72,7 +73,7 @@ t_coder *heappop(t_heap *heap)
     return popped;
 }
 
-t_heap *heap_init(int capacity)
+t_heap *heap_init(int capacity, int policy)
 {
     t_heap *heap;
 
@@ -83,7 +84,8 @@ t_heap *heap_init(int capacity)
         return NULL;
     heap->size = 0;
     heap->capacity = capacity;
-    heap->coders = malloc(sizeof(int) * capacity);
+    heap->policy = policy;
+    heap->coders = malloc(sizeof(t_coder *) * capacity);
     if (!heap->coders) {
         free(heap);
         return NULL;

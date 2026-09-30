@@ -6,7 +6,7 @@
 /*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:51:29 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/29 23:31:53 by aixel            ###   ########.fr       */
+/*   Updated: 2026/09/30 21:45:59 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,34 +161,25 @@ void	add_talking_pillow_to_coders(t_conf *conf)
 
 	i = 0;
 	while (i < conf->simconf[N_CODERS])
-		conf->coders[i++]->radio = &conf->radio;
+		conf->coders[i++]->radio = conf->radio;
 }
 
 int main(int ac, char *av[])
 {
-	t_conf	conf;
+	t_conf	*conf;
 	setbuf(stdout, NULL);
 
-	if (init_conf(ac - 1, av + 1, &conf))
-		fprintf(stderr, "Error\n");
+	conf = init_conf(ac -1, av + 1);
+	if (!conf)
+		return (fprintf(stderr, "Error\n"), 1);
 
-	clock_gettime(CLOCK_MONOTONIC, conf.start_time);
+	clock_gettime(CLOCK_MONOTONIC, conf->start_time);
 
-	conf.coders = init_coders(&conf);
-	if (!conf.coders)
-		fprintf(stderr, "Errors\n");
+	add_dongles_to_coders(conf);
+	add_talking_pillow_to_coders(conf);
 
-	conf.dongles = init_dongles(&conf);
-	if (!conf.dongles)
-		fprintf(stderr, "Error\n");
+	pthread_t *thread_ids = start_coders(conf);
 
-	add_dongles_to_coders(&conf);
-	add_talking_pillow_to_coders(&conf);
-
-	conf.thread_ids = start_coders(&conf);
-	if (!conf.thread_ids)
-		fprintf(stderr, "Error\n");
-
-	pthread_join(conf.thread_ids[0], NULL);
+	pthread_join(thread_ids[0], NULL);
 	return 0;
 }

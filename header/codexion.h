@@ -6,7 +6,7 @@
 /*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/29 23:20:01 by aixel            ###   ########.fr       */
+/*   Updated: 2026/09/30 21:59:44 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ typedef struct s_coder {
 typedef struct s_heap {
     int		size;
     int		capacity;
+	int		policy;
     t_coder	**coders;
 } t_heap;
 
@@ -75,20 +76,16 @@ typedef struct s_heap {
 typedef struct	s_conf
 {
 	int				*simconf;
-	struct timespec	*start_time;
 	t_coder			**coders;
 	t_dongle		**dongles;
-	pthread_t		*thread_ids;
-	pthread_mutex_t	radio;
-	t_heap			heap;
+	struct timespec	*start_time;
+	pthread_mutex_t	*radio;
 }					t_conf;
 
 void print_timestamp(struct timespec *start_time);
 
 // init
-int		init_conf(int arg_cnt, char **args, t_conf *conf);
-t_coder	**init_coders(t_conf *conf);
-t_dongle	**init_dongles(t_conf *conf);
+t_conf	*init_conf(int arg_cnt, char **args);
 
 // -- debug --
 void	display_conf(int *simconf);
@@ -96,7 +93,7 @@ void	heap_print(t_heap *heap);
 
 // heap api
 
-t_heap	*heap_init(int capacity);
+t_heap	*heap_init(int capacity, int policy);
 t_coder *heappop(t_heap *heap);
 void    heappush(t_heap *heap, t_coder *newcoder);
 
