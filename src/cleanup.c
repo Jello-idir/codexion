@@ -31,9 +31,6 @@ void	cleancoders(t_coder **coders, int count)
 	while (count > 0)
 	{
 		count--;
-		if (coders[count]->mutex)
-			pthread_mutex_destroy(coders[count]->mutex);
-		free(coders[count]->mutex);
 		free(coders[count]);
 	}
 	free(coders);

@@ -33,9 +33,6 @@
 # define FIFO 1
 # define EDF 2
 
-# define FIRST 0
-# define SECOND 1
-
 typedef struct s_heap	t_heap;
 typedef struct s_cnf	t_cnf;
 
@@ -53,7 +50,6 @@ typedef struct s_coder
 {
 	unsigned int		id;
 	int					ncompile;
-	pthread_mutex_t		*mutex;
 	t_cnf				*conf;
 	t_dongle			*rdongle;
 	t_dongle			*ldongle;
@@ -86,7 +82,6 @@ typedef struct s_cnf
 	int				stopped;
 }					t_cnf;
 
-pthread_cond_t		*init_cond(void);
 pthread_mutex_t		*init_mutex(void);
 t_cnf				*init_conf(int arg_cnt, char **args);
 t_coder				**init_coders(t_cnf *conf);
@@ -99,7 +94,6 @@ void				cleandongles(t_dongle **dongles, int count);
 void				cleancnf(t_cnf *cnf);
 
 t_heap				*heap_init(int policy);
-t_coder				*heappop(t_heap *heap);
 t_coder				*heappeek(t_heap *heap);
 void				heappush(t_heap *heap, t_coder *newcoder);
 void				heapremove(t_heap *heap, t_coder *coder);

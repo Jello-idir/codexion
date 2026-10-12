@@ -1,5 +1,11 @@
+# gitignore
+.gitignore
+
 # main executable
 codexion
 
 # object files
 *.o
+
+# subject
+en.subject.pdf

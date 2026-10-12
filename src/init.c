@@ -12,7 +12,7 @@
 
 #include "../header/codexion.h"
 
-pthread_cond_t	*init_cond(void)
+static pthread_cond_t	*init_cond(void)
 {
 	pthread_cond_t	*cond;
 

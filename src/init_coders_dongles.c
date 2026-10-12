@@ -20,9 +20,6 @@ static t_coder	*init_coder(t_cnf *conf, int index)
 	if (!coder)
 		return (NULL);
 	memset(coder, 0, sizeof(t_coder));
-	coder->mutex = init_mutex();
-	if (!coder->mutex)
-		return (free(coder), NULL);
 	coder->id = index + 1;
 	coder->ncompile = conf->args[N_COMPILES];
 	coder->conf = conf;

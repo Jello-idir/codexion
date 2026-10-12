@@ -34,19 +34,6 @@ void	heappush(t_heap *heap, t_coder *newcoder)
 	}
 }
 
-t_coder	*heappop(t_heap *heap)
-{
-	t_coder	*popped;
-
-	if (heap->size <= 0)
-		return (NULL);
-	popped = heap->requests[0].coder;
-	heap->size--;
-	if (heap->size == 1)
-		heap->requests[0] = heap->requests[1];
-	return (popped);
-}
-
 t_coder	*heappeek(t_heap *heap)
 {
 	if (heap->size <= 0)
