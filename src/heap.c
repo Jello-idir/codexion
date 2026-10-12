@@ -5,90 +5,82 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/09/20 18:03:06 by aixel             #+#    #+#             */
-/*   Updated: 2026/09/30 21:08:17 by aixel            ###   ########.fr       */
+/*   Created: 2026/07/08 18:51:29 by aait-idi          #+#    #+#             */
+/*   Updated: 2026/10/09 10:51:01 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/codexion.h"
 
-static void    swap(t_coder **a, t_coder **b)
+void	heappush(t_heap *heap, t_coder *newcoder)
 {
-    t_coder *tmp;
+	int			index;
+	t_request	tmp;
 
-    tmp = *a;
-    *a = *b;
-    *b = tmp;
+	if (heap->size >= 2)
+	{
+		fprintf(stderr, "heap error!\n");
+		return ;
+	}
+	index = heap->size++;
+	heap->requests[index].coder = newcoder;
+	heap->requests[index].deadline = newcoder->death_time;
+	if (heap->size == 2 && heap->policy == EDF
+		&& heap->requests[1].deadline < heap->requests[0].deadline)
+	{
+		tmp = heap->requests[0];
+		heap->requests[0] = heap->requests[1];
+		heap->requests[1] = tmp;
+	}
 }
 
-static void    heappify(t_heap *heap, int index)
+t_coder	*heappop(t_heap *heap)
 {
-    int small;
-    int left;
-    int right;
+	t_coder	*popped;
 
-    small = index;
-    left = small * 2 + 1;
-    right = small * 2 + 2;
-
-    if (heap->size > left && heap->coders[left]->death_time < heap->coders[small]->death_time)
-        small = left;
-    if (heap->size > right && heap->coders[right]->death_time < heap->coders[small]->death_time)
-        small = right;
-    if (small != index) {
-        swap(heap->coders + small, heap->coders + index);
-        heappify(heap, small);
-    }
+	if (heap->size <= 0)
+		return (NULL);
+	popped = heap->requests[0].coder;
+	heap->size--;
+	if (heap->size == 1)
+		heap->requests[0] = heap->requests[1];
+	return (popped);
 }
 
-void    heappush(t_heap *heap, t_coder *newcoder)
+t_coder	*heappeek(t_heap *heap)
 {
-    int index;
-
-    if (heap->size >= heap->capacity)
-    {
-        fprintf(stderr, "heap error!");
-        return;
-    }
-    heap->size++;
-    index = heap->size - 1;
-    heap->coders[index] = newcoder;
-    while (index > 0 && heap->coders[index]->death_time < heap->coders[(index - 1) / 2]->death_time)
-    {
-        swap(heap->coders + index, heap->coders + ((index - 1) / 2));
-        index = (index - 1) / 2;
-    }
+	if (heap->size <= 0)
+		return (NULL);
+	return (heap->requests[0].coder);
 }
 
-t_coder *heappop(t_heap *heap)
+void	heapremove(t_heap *heap, t_coder *coder)
 {
-    t_coder *popped;
+	int	i;
 
-    if (heap->size <= 0)
-        return NULL;
-    popped = heap->coders[0];
-    swap(heap->coders, heap->coders + heap->size - 1);
-    heap->size--;
-    heappify(heap, 0);
-    return popped;
+	i = 0;
+	while (i < heap->size && heap->requests[i].coder != coder)
+		i++;
+	if (i == heap->size)
+		return ;
+	heap->size--;
+	while (i < heap->size)
+	{
+		heap->requests[i] = heap->requests[i + 1];
+		i++;
+	}
 }
 
-t_heap *heap_init(int capacity, int policy)
+t_heap	*heap_init(int policy)
 {
-    t_heap *heap;
+	t_heap	*heap;
 
-    if (capacity <= 0)
-        return NULL;
-    heap = malloc(sizeof(t_heap));
-    if (!heap)
-        return NULL;
-    heap->size = 0;
-    heap->capacity = capacity;
-    heap->policy = policy;
-    heap->coders = malloc(sizeof(t_coder *) * capacity);
-    if (!heap->coders) {
-        free(heap);
-        return NULL;
-    }
-    return heap;
+	if (policy != FIFO && policy != EDF)
+		return (NULL);
+	heap = malloc(sizeof(*heap));
+	if (!heap)
+		return (NULL);
+	heap->size = 0;
+	heap->policy = policy;
+	return (heap);
 }

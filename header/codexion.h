@@ -6,95 +6,124 @@
 /*   By: aixel <aixel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/08 18:52:30 by aait-idi          #+#    #+#             */
-/*   Updated: 2026/09/30 21:59:44 by aixel            ###   ########.fr       */
+/*   Updated: 2026/10/09 16:12:44 by aixel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CODEXION_H
 # define CODEXION_H
 
-#include <unistd.h> // not sure if used
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <pthread.h>
-#include <time.h>
+# include <unistd.h>
+# include <stdio.h>
+# include <limits.h>
+# include <stdlib.h>
+# include <string.h>
+# include <pthread.h>
+# include <time.h>
 
-// -----------------
-#define N_CODERS 0
-#define BURNOUT_T 1
-#define COMPILE_T 2
-#define DEBUG_T 3
-#define REFACTOR_T 4
-#define N_COMPILES 5
-#define D_COOLDOWN 6
-#define SCHEDULER 7
-// -----------------
-#define FIFO 1
-#define EDF 2
-// -----------------
-#define ALCERR 1
-#define CNDERR 2
-#define MTXERR 3
-// -----------------
-#define FIRST 0
-#define SECOND 1
+# define N_CODERS 0
+# define BURNOUT_T 1
+# define COMPILE_T 2
+# define DEBUG_T 3
+# define REFACTOR_T 4
+# define N_COMPILES 5
+# define D_COOLDOWN 6
+# define SCHEDULER 7
 
+# define FIFO 1
+# define EDF 2
+
+# define FIRST 0
+# define SECOND 1
+
+typedef struct s_heap	t_heap;
+typedef struct s_cnf	t_cnf;
 
 typedef struct s_dongle
 {
-	int				id;
-	int				available;
-	struct timespec	released_at;
-	pthread_mutex_t	mutex;
-	pthread_cond_t	ready;
-}	t_dongle;
+	int					id;
+	int					available;
+	pthread_mutex_t		*mutex;
+	t_heap				*heap;
+	unsigned long long	cooldown;
+	struct timespec		released_at;
+}						t_dongle;
 
-
-typedef struct s_coder {
-	unsigned int	id;
-	pthread_t		thread;
-	pthread_cond_t	perm;
-	pthread_mutex_t	mutex;
-	int				*simconf;
-	struct timespec	*start_time;
-	t_dongle		*rdongle;
-	t_dongle		*ldongle;
-	pthread_mutex_t	*radio;
-	int				death_time;
-}	t_coder;
-
-
-typedef struct s_heap {
-    int		size;
-    int		capacity;
-	int		policy;
-    t_coder	**coders;
-} t_heap;
-
-
-typedef struct	s_conf
+typedef struct s_coder
 {
-	int				*simconf;
+	unsigned int		id;
+	int					ncompile;
+	pthread_mutex_t		*mutex;
+	t_cnf				*conf;
+	t_dongle			*rdongle;
+	t_dongle			*ldongle;
+	unsigned long long	death_time;
+}						t_coder;
+
+typedef struct s_request
+{
+	t_coder				*coder;
+	unsigned long long	deadline;
+}	t_request;
+
+struct s_heap
+{
+	int			size;
+	int			policy;
+	t_request	requests[2];
+};
+
+typedef struct s_cnf
+{
+	int				*args;
 	t_coder			**coders;
 	t_dongle		**dongles;
 	struct timespec	*start_time;
 	pthread_mutex_t	*radio;
-}					t_conf;
+	pthread_mutex_t	*simmutex;
+	pthread_cond_t	*changed;
+	int				queued;
+	int				stopped;
+}					t_cnf;
 
-void print_timestamp(struct timespec *start_time);
+pthread_cond_t		*init_cond(void);
+pthread_mutex_t		*init_mutex(void);
+t_cnf				*init_conf(int arg_cnt, char **args);
+t_coder				**init_coders(t_cnf *conf);
+t_dongle			**init_dongles(t_cnf *conf);
+int					*init_simconf(int arg_cnt, char **args);
 
-// init
-t_conf	*init_conf(int arg_cnt, char **args);
+void				cleandongle(t_dongle *dongle);
+void				cleancoders(t_coder **coders, int count);
+void				cleandongles(t_dongle **dongles, int count);
+void				cleancnf(t_cnf *cnf);
 
-// -- debug --
-void	display_conf(int *simconf);
-void	heap_print(t_heap *heap);
+t_heap				*heap_init(int policy);
+t_coder				*heappop(t_heap *heap);
+t_coder				*heappeek(t_heap *heap);
+void				heappush(t_heap *heap, t_coder *newcoder);
+void				heapremove(t_heap *heap, t_coder *coder);
 
-// heap api
+unsigned long long	ts_to_ns(struct timespec *ts);
+unsigned long long	get_simulation_time(struct timespec *start_time);
+int					simulation_sleep(t_cnf *conf, int duration);
 
-t_heap	*heap_init(int capacity, int policy);
-t_coder *heappop(t_heap *heap);
-void    heappush(t_heap *heap, t_coder *newcoder);
+int					isstopped(t_cnf *conf);
+void				log_locked(t_coder *coder, unsigned long long now,
+						char *what);
+int					radio_message(t_coder *coder, char *what);
+int					get_dongles(t_coder *coder);
+void				lock_dongles(t_coder *coder);
+void				unlock_dongles(t_coder *coder);
+int					dongles_available(t_coder *coder);
+unsigned long long	dongles_ready_at(t_coder *coder);
+void				wait_for_dongles(t_coder *coder);
+void				wait_cooldown(t_cnf *conf, unsigned long long end);
+void				queue_requests(t_coder *coder);
+void				release_dongles(t_coder *coder);
+void				wake_dongles(t_cnf *conf);
+void				*coderjob(void *arg);
+void				*monitor(void *arg);
+int					run_simulation(t_cnf *conf, pthread_t *threads);
 
 #endif

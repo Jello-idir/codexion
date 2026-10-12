@@ -1,9 +1,21 @@
 NAME = codexion
 
 CC = cc
-CFLAGS = -pthread
+CFLAGS = -Wall -Wextra -Werror -pthread
 
-SRC = src/main.c src/init.c src/heap.c
+SRC = src/main.c \
+	src/simulation.c \
+	src/time.c \
+	src/logging.c \
+	src/monitor.c \
+	src/coder.c \
+	src/dongle.c \
+	src/dongle_wait.c \
+	src/init.c \
+	src/init_coders_dongles.c \
+	src/parse.c \
+	src/heap.c \
+	src/cleanup.c
 OBJ = $(SRC:.c=.o)
 HEADERS = header/codexion.h
 # ----------------------
@@ -25,15 +37,15 @@ fclean: clean
 re: fclean all
 
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re run
 
-number_of_coders				= 24
-time_to_burnout					= 800
-time_to_compile					= 200
-time_to_debug					= 100
-time_to_refactor				= 300
-number_of_compiles_required 	= 20
-dongle_cooldown					= 100
+number_of_coders				= 2
+time_to_burnout					= 1003
+time_to_compile					= 500
+time_to_debug					= 1
+time_to_refactor				= 1
+number_of_compiles_required 	= 10
+dongle_cooldown					= 0
 scheduler						= "fifo"
 
 run: $(NAME)
@@ -46,14 +58,3 @@ run: $(NAME)
 	 $(number_of_compiles_required) \
 	 $(dongle_cooldown)\
 	 $(scheduler)
-
-# SRC_BONUS =
-# OBJ_BONUS = $(SRC_BONUS:.c=.o)
-
-# bonus: $(BONUS)
-
-# $(BONUS): $(OBJ_BONUS)
-# 	$(CC) $(CFLAGS) $(OBJ_BONUS) -o $(BONUS)
-
-# %_bonus.o: %_bonus.c
-# 	$(CC) $(CFLAGS) -c $< -o $@
