@@ -20,7 +20,6 @@ SRC = src/main.c \
 	src/cleanup.c
 OBJ = $(SRC:.c=.o)
 HEADERS = header/codexion.h
-# ----------------------
 
 all: $(NAME)
 
@@ -38,28 +37,4 @@ fclean: clean
 
 re: fclean all
 
-
-.PHONY: all clean fclean re run test
-
-test: $(NAME)
-	python3 tests/regression.py
-
-number_of_coders				= 2
-time_to_burnout					= 1003
-time_to_compile					= 500
-time_to_debug					= 1
-time_to_refactor				= 1
-number_of_compiles_required 	= 10
-dongle_cooldown					= -1
-scheduler						= "fifo"
-
-run: $(NAME)
-	@./$(NAME)\
-	 $(number_of_coders)\
-	 $(time_to_burnout)\
-	 $(time_to_compile)\
-	 $(time_to_debug)\
-	 $(time_to_refactor)\
-	 $(number_of_compiles_required) \
-	 $(dongle_cooldown)\
-	 $(scheduler)
+.PHONY: all clean fclean re
